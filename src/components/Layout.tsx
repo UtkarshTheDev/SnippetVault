@@ -6,9 +6,23 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Command, CommandInput, CommandList } from "@/components/ui/command";
-import { Code, Plus, Clock, Tag, Settings, Search, Filter } from "lucide-react";
+import {
+  Code,
+  Plus,
+  Clock,
+  Tag,
+  Settings,
+  Search,
+  Filter,
+  Heart,
+  Eye,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { loadSnippets, type SearchFilters } from "@/lib/snippetStorage";
+import {
+  loadSnippets,
+  type SearchFilters,
+  type Snippet,
+} from "@/lib/snippetStorage";
 import {
   Select,
   SelectContent,
@@ -25,6 +39,15 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { CodeBlock } from "@/components/ui/code-block";
 
 const Layout: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -36,10 +59,12 @@ const Layout: React.FC = () => {
   const [availableLanguages, setAvailableLanguages] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [favoriteSnippets, setFavoriteSnippets] = useState<Snippet[]>([]);
+  const [viewingSnippet, setViewingSnippet] = useState<Snippet | null>(null);
 
-  // Fetch available languages and tags for filters
+  // Fetch available languages, tags, and favorite snippets
   useEffect(() => {
-    const fetchLanguagesAndTags = async () => {
+    const fetchData = async () => {
       const snippets = await loadSnippets();
 
       // Extract unique languages
@@ -53,9 +78,13 @@ const Layout: React.FC = () => {
         ...new Set(snippets.flatMap((snippet) => snippet.tags)),
       ].filter(Boolean);
       setAvailableTags(tags);
+
+      // Get favorite snippets
+      const favorites = snippets.filter((snippet) => snippet.liked);
+      setFavoriteSnippets(favorites);
     };
 
-    fetchLanguagesAndTags();
+    fetchData();
   }, [refreshKey]);
 
   // Debounce search query to avoid too many re-renders
@@ -111,6 +140,14 @@ const Layout: React.FC = () => {
     setSearchQuery("");
   };
 
+  const handleViewSnippet = (snippet: Snippet) => {
+    setViewingSnippet(snippet);
+  };
+
+  const handleCloseSnippetView = () => {
+    setViewingSnippet(null);
+  };
+
   return (
     <div className="flex w-full h-full min-h-screen bg-background text-foreground">
       {/* Sidebar */}
@@ -123,11 +160,31 @@ const Layout: React.FC = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full bg-sidebar-accent/10">
-            <TabsTrigger value="all" className="flex-1">
+          <TabsList className="w-full !bg-sidebar-accent/10 !p-1 !rounded-md !border !border-border">
+            <TabsTrigger
+              value="all"
+              className="flex-1 !data-[state=active]:bg-sidebar-accent/30 !data-[state=active]:text-primary !hover:bg-sidebar-accent/20 !transition-all !duration-200 !text-sidebar-foreground"
+              style={
+                {
+                  "--tw-ring-color": "transparent",
+                  "--tw-ring-shadow": "none",
+                  "--tw-shadow": "none",
+                } as React.CSSProperties
+              }
+            >
               All
             </TabsTrigger>
-            <TabsTrigger value="favorites" className="flex-1">
+            <TabsTrigger
+              value="favorites"
+              className="flex-1 !data-[state=active]:bg-sidebar-accent/30 !data-[state=active]:text-primary !hover:bg-sidebar-accent/20 !transition-all !duration-200 !text-sidebar-foreground"
+              style={
+                {
+                  "--tw-ring-color": "transparent",
+                  "--tw-ring-shadow": "none",
+                  "--tw-shadow": "none",
+                } as React.CSSProperties
+              }
+            >
               Favorites
             </TabsTrigger>
           </TabsList>
@@ -135,14 +192,28 @@ const Layout: React.FC = () => {
           <TabsContent value="all" className="mt-4 space-y-1">
             <Button
               variant="ghost"
-              className="w-full justify-start text-sidebar-foreground"
+              className="w-full justify-start !text-sidebar-foreground !hover:bg-sidebar-accent/20 !hover:text-primary !transition-all !duration-200"
+              style={
+                {
+                  "--tw-ring-color": "transparent",
+                  "--tw-ring-shadow": "none",
+                  "--tw-shadow": "none",
+                } as React.CSSProperties
+              }
             >
               <Clock className="mr-2 h-4 w-4" />
               Recent
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start text-sidebar-foreground"
+              className="w-full justify-start !text-sidebar-foreground !hover:bg-sidebar-accent/20 !hover:text-primary !transition-all !duration-200"
+              style={
+                {
+                  "--tw-ring-color": "transparent",
+                  "--tw-ring-shadow": "none",
+                  "--tw-shadow": "none",
+                } as React.CSSProperties
+              }
             >
               <Tag className="mr-2 h-4 w-4" />
               Tags
@@ -150,9 +221,33 @@ const Layout: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="favorites" className="mt-4">
-            <div className="text-sm text-sidebar-foreground/70 text-center py-4">
-              No favorites yet
-            </div>
+            {favoriteSnippets.length > 0 ? (
+              <div className="space-y-1">
+                {favoriteSnippets.map((snippet) => (
+                  <Button
+                    key={snippet.id}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start !text-sidebar-foreground !hover:bg-sidebar-accent/20 !hover:text-primary !transition-all !duration-200 truncate group"
+                    onClick={() => handleViewSnippet(snippet)}
+                    style={
+                      {
+                        "--tw-ring-color": "transparent",
+                        "--tw-ring-shadow": "none",
+                        "--tw-shadow": "none",
+                      } as React.CSSProperties
+                    }
+                  >
+                    <Heart className="h-4 w-4 mr-2 fill-destructive text-destructive !group-hover:scale-110 !transition-transform" />
+                    <span className="truncate">{snippet.title}</span>
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-sidebar-foreground/70 text-center py-4">
+                No favorites yet
+              </div>
+            )}
           </TabsContent>
         </Tabs>
 
@@ -161,7 +256,14 @@ const Layout: React.FC = () => {
         <div className="mt-auto">
           <Button
             variant="ghost"
-            className="w-full justify-start text-sidebar-foreground"
+            className="w-full justify-start !text-sidebar-foreground !hover:bg-sidebar-accent/20 !hover:text-primary !transition-all !duration-200"
+            style={
+              {
+                "--tw-ring-color": "transparent",
+                "--tw-ring-shadow": "none",
+                "--tw-shadow": "none",
+              } as React.CSSProperties
+            }
           >
             <Settings className="mr-2 h-4 w-4" />
             Settings
@@ -211,24 +313,58 @@ const Layout: React.FC = () => {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-72" align="end">
+              <PopoverContent
+                className="w-72 !bg-sidebar !text-sidebar-foreground !border-border dark"
+                align="end"
+                style={{
+                  backgroundColor: "var(--sidebar)",
+                  color: "var(--sidebar-foreground)",
+                  borderColor: "var(--border)",
+                }}
+              >
                 <div className="space-y-4">
-                  <h4 className="font-medium leading-none">Filters</h4>
-                  <Separator />
+                  <h4 className="font-medium leading-none text-primary">
+                    Filters
+                  </h4>
+                  <Separator className="bg-border" />
 
                   <div className="space-y-2">
-                    <Label htmlFor="language-filter">Language</Label>
+                    <Label
+                      htmlFor="language-filter"
+                      className="text-sidebar-foreground"
+                    >
+                      Language
+                    </Label>
                     <Select
                       value={filters.language || "all"}
                       onValueChange={handleLanguageFilterChange}
                     >
-                      <SelectTrigger id="language-filter">
+                      <SelectTrigger
+                        id="language-filter"
+                        className="bg-sidebar-accent/10 border-border text-sidebar-foreground"
+                      >
                         <SelectValue placeholder="All languages" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All languages</SelectItem>
+                      <SelectContent
+                        className="!bg-sidebar !border-border !text-sidebar-foreground !rounded-md !shadow-md dark"
+                        style={{
+                          backgroundColor: "var(--sidebar)",
+                          color: "var(--sidebar-foreground)",
+                          borderColor: "var(--border)",
+                        }}
+                      >
+                        <SelectItem
+                          value="all"
+                          className="!text-sidebar-foreground hover:!bg-sidebar-accent/20 hover:!text-primary focus:!bg-sidebar-accent/20 focus:!text-primary"
+                        >
+                          All languages
+                        </SelectItem>
                         {availableLanguages.map((lang) => (
-                          <SelectItem key={lang} value={lang}>
+                          <SelectItem
+                            key={lang}
+                            value={lang}
+                            className="!text-sidebar-foreground hover:!bg-sidebar-accent/20 hover:!text-primary focus:!bg-sidebar-accent/20 focus:!text-primary"
+                          >
                             {lang.charAt(0).toUpperCase() + lang.slice(1)}
                           </SelectItem>
                         ))}
@@ -238,18 +374,42 @@ const Layout: React.FC = () => {
 
                   {availableTags.length > 0 && (
                     <div className="space-y-2">
-                      <Label htmlFor="tag-filter">Tag</Label>
+                      <Label
+                        htmlFor="tag-filter"
+                        className="text-sidebar-foreground"
+                      >
+                        Tag
+                      </Label>
                       <Select
                         value={filters.tag || "all"}
                         onValueChange={handleTagFilterChange}
                       >
-                        <SelectTrigger id="tag-filter">
+                        <SelectTrigger
+                          id="tag-filter"
+                          className="bg-sidebar-accent/10 border-border text-sidebar-foreground"
+                        >
                           <SelectValue placeholder="All tags" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All tags</SelectItem>
+                        <SelectContent
+                          className="!bg-sidebar !border-border !text-sidebar-foreground !rounded-md !shadow-md dark"
+                          style={{
+                            backgroundColor: "var(--sidebar)",
+                            color: "var(--sidebar-foreground)",
+                            borderColor: "var(--border)",
+                          }}
+                        >
+                          <SelectItem
+                            value="all"
+                            className="!text-sidebar-foreground hover:!bg-sidebar-accent/20 hover:!text-primary focus:!bg-sidebar-accent/20 focus:!text-primary"
+                          >
+                            All tags
+                          </SelectItem>
                           {availableTags.map((tag) => (
-                            <SelectItem key={tag} value={tag}>
+                            <SelectItem
+                              key={tag}
+                              value={tag}
+                              className="!text-sidebar-foreground hover:!bg-sidebar-accent/20 hover:!text-primary focus:!bg-sidebar-accent/20 focus:!text-primary"
+                            >
                               {tag}
                             </SelectItem>
                           ))}
@@ -261,7 +421,7 @@ const Layout: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full"
+                    className="w-full bg-sidebar-accent/10 hover:bg-sidebar-accent/20 text-primary border-border"
                     onClick={handleClearFilters}
                   >
                     Clear Filters
@@ -316,6 +476,48 @@ const Layout: React.FC = () => {
           </main>
         </ScrollArea>
       </div>
+
+      {/* Snippet View Dialog */}
+      <Dialog
+        open={viewingSnippet !== null}
+        onOpenChange={handleCloseSnippetView}
+      >
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col bg-sidebar text-sidebar-foreground border-border dark">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between text-primary">
+              <span>{viewingSnippet?.title}</span>
+              <Badge
+                variant="outline"
+                className="bg-sidebar-accent/10 text-primary"
+              >
+                {viewingSnippet?.language}
+              </Badge>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-hidden my-4">
+            {viewingSnippet && (
+              <CodeBlock
+                code={viewingSnippet.content}
+                language={viewingSnippet.language || "javascript"}
+                showLineNumbers={true}
+                maxHeight="60vh"
+                className="border border-border"
+              />
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleCloseSnippetView}
+              className="bg-sidebar-accent/10 hover:bg-sidebar-accent/20 text-primary border-border"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
