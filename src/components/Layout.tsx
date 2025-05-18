@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import SnippetList from "./SnippetList";
 import SnippetEditor from "./SnippetEditor";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Layout: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+  const [refreshKey, setRefreshKey] = useState(0);
+  const snippetListRef = useRef<any>(null);
 
   const handleCreateSnippetClick = () => {
     setIsEditing(true);
@@ -19,7 +21,8 @@ const Layout: React.FC = () => {
 
   const handleSaveSnippet = () => {
     setIsEditing(false);
-    // Consider refreshing snippet list here later
+    // Refresh the snippet list
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleCancelEdit = () => {
@@ -116,7 +119,7 @@ const Layout: React.FC = () => {
               </div>
             ) : (
               <div className="w-full h-full bg-background">
-                <SnippetList />
+                <SnippetList key={refreshKey} ref={snippetListRef} />
               </div>
             )}
 

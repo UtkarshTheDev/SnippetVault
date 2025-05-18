@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { loadSnippets, saveSnippets } from "../lib/snippetStorage";
+import React, { useState } from "react";
+import { addSnippet, type Snippet } from "../lib/snippetStorage";
 import { v4 as uuidv4 } from "uuid";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,17 +16,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeBlock } from "@/components/ui/code-block";
-
-interface Snippet {
-  id: string;
-  title: string;
-  content: string;
-  language: string;
-  tags: string[];
-  liked: boolean;
-  description: string;
-  mediaUrl?: string;
-}
+import { toast } from "sonner";
 
 interface SnippetEditorProps {
   onSave: () => void;
@@ -63,6 +53,17 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
   const [activeTab, setActiveTab] = useState("edit");
 
   const handleSave = async () => {
+    if (!title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+
+    if (!content.trim()) {
+      toast.error("Code content is required");
+      return;
+    }
+
+    const now = Date.now();
     const newSnippet: Snippet = {
       id: uuidv4(), // Generate unique ID
       title,
@@ -75,13 +76,19 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
       liked: false,
       description,
       mediaUrl,
+      createdAt: now,
+      updatedAt: now,
     };
 
-    // Load existing snippets, add the new one, and save
-    const existingSnippets = await loadSnippets();
-    const updatedSnippets = [...existingSnippets, newSnippet];
-    await saveSnippets(updatedSnippets);
-    onSave(); // Call the parent's onSave handler
+    // Add the new snippet
+    const success = await addSnippet(newSnippet);
+
+    if (success) {
+      toast.success("Snippet saved successfully");
+      onSave(); // Call the parent's onSave handler
+    } else {
+      toast.error("Failed to save snippet");
+    }
   };
 
   return (

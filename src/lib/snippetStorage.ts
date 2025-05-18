@@ -2,26 +2,102 @@ import localforage from "localforage";
 
 const SNIPPET_STORAGE_KEY = "snippetvault_snippets";
 
-export const saveSnippets = async (snippets: any[]) => {
+export interface Snippet {
+  id: string;
+  title: string;
+  content: string;
+  language: string;
+  tags: string[];
+  liked: boolean;
+  description: string;
+  mediaUrl?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+// Save all snippets
+export const saveSnippets = async (snippets: Snippet[]): Promise<boolean> => {
   try {
     await localforage.setItem(SNIPPET_STORAGE_KEY, snippets);
-    console.log("Snippets saved successfully");
+    return true;
   } catch (error) {
     console.error("Error saving snippets:", error);
+    return false;
   }
 };
 
-export const loadSnippets = async (): Promise<any[]> => {
+// Load all snippets
+export const loadSnippets = async (): Promise<Snippet[]> => {
   try {
     const snippets = await localforage.getItem(SNIPPET_STORAGE_KEY);
-    console.log("Snippets loaded successfully");
     if (snippets === null || snippets === undefined) {
       return [];
     } else {
-      return snippets as any[];
+      return snippets as Snippet[];
     }
   } catch (error) {
     console.error("Error loading snippets:", error);
     return [];
+  }
+};
+
+// Add a new snippet
+export const addSnippet = async (snippet: Snippet): Promise<boolean> => {
+  try {
+    const snippets = await loadSnippets();
+    const updatedSnippets = [...snippets, snippet];
+    return await saveSnippets(updatedSnippets);
+  } catch (error) {
+    console.error("Error adding snippet:", error);
+    return false;
+  }
+};
+
+// Update an existing snippet
+export const updateSnippet = async (
+  updatedSnippet: Snippet
+): Promise<boolean> => {
+  try {
+    const snippets = await loadSnippets();
+    const updatedSnippets = snippets.map((snippet) =>
+      snippet.id === updatedSnippet.id ? updatedSnippet : snippet
+    );
+    return await saveSnippets(updatedSnippets);
+  } catch (error) {
+    console.error("Error updating snippet:", error);
+    return false;
+  }
+};
+
+// Delete a snippet
+export const deleteSnippet = async (snippetId: string): Promise<boolean> => {
+  try {
+    const snippets = await loadSnippets();
+    const filteredSnippets = snippets.filter(
+      (snippet) => snippet.id !== snippetId
+    );
+    return await saveSnippets(filteredSnippets);
+  } catch (error) {
+    console.error("Error deleting snippet:", error);
+    return false;
+  }
+};
+
+// Toggle like status
+export const toggleSnippetLike = async (
+  snippetId: string
+): Promise<boolean> => {
+  try {
+    const snippets = await loadSnippets();
+    const updatedSnippets = snippets.map((snippet) => {
+      if (snippet.id === snippetId) {
+        return { ...snippet, liked: !snippet.liked };
+      }
+      return snippet;
+    });
+    return await saveSnippets(updatedSnippets);
+  } catch (error) {
+    console.error("Error toggling snippet like:", error);
+    return false;
   }
 };
