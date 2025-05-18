@@ -177,6 +177,11 @@ const SnippetList = React.forwardRef<HTMLDivElement, SnippetListProps>(
           <p className="text-muted-foreground mb-4">
             Create your first code snippet to get started
           </p>
+          <p className="text-muted-foreground text-sm max-w-md">
+            If you're seeing this message, try refreshing the page to load the
+            sample snippets. Sample snippets should automatically load for new
+            users.
+          </p>
         </div>
       );
     }

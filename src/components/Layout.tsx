@@ -20,6 +20,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   loadSnippets,
+  initializeWithSampleSnippetsIfNeeded,
   type SearchFilters,
   type Snippet,
 } from "@/lib/snippetStorage";
@@ -61,6 +62,18 @@ const Layout: React.FC = () => {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [favoriteSnippets, setFavoriteSnippets] = useState<Snippet[]>([]);
   const [viewingSnippet, setViewingSnippet] = useState<Snippet | null>(null);
+
+  // Initialize sample snippets when app first loads
+  useEffect(() => {
+    const initializeApp = async () => {
+      // Check if snippets exist, if not, initialize with sample snippets
+      await initializeWithSampleSnippetsIfNeeded();
+      // Refresh the snippet list after initialization
+      setRefreshKey((prev) => prev + 1);
+    };
+
+    initializeApp();
+  }, []);
 
   // Fetch available languages, tags, and favorite snippets
   useEffect(() => {

@@ -1,4 +1,5 @@
 import localforage from "localforage";
+import { sampleSnippets, initializeSampleSnippets } from "./sampleSnippets";
 
 const SNIPPET_STORAGE_KEY = "snippetvault_snippets";
 
@@ -148,3 +149,37 @@ export const toggleSnippetLike = async (
     return false;
   }
 };
+
+// Check if any snippets exist
+export const hasSnippets = async (): Promise<boolean> => {
+  try {
+    const snippets = await localforage.getItem(SNIPPET_STORAGE_KEY);
+    return (
+      snippets !== null &&
+      snippets !== undefined &&
+      Array.isArray(snippets) &&
+      (snippets as Snippet[]).length > 0
+    );
+  } catch (error) {
+    console.error("Error checking if snippets exist:", error);
+    return false;
+  }
+};
+
+// Initialize with sample snippets if no snippets exist
+export const initializeWithSampleSnippetsIfNeeded =
+  async (): Promise<boolean> => {
+    try {
+      const snippetsExist = await hasSnippets();
+
+      if (!snippetsExist) {
+        console.log("No snippets found, initializing with sample snippets...");
+        return await initializeSampleSnippets(saveSnippets);
+      }
+
+      return true; // Already initialized
+    } catch (error) {
+      console.error("Error initializing with sample snippets:", error);
+      return false;
+    }
+  };
