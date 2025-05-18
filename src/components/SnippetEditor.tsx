@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { loadSnippets, saveSnippets } from "../lib/snippetStorage";
 import { v4 as uuidv4 } from "uuid";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CodeBlock } from "@/components/ui/code-block";
 
 interface Snippet {
   id: string;
@@ -58,6 +60,7 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
   const [tags, setTags] = useState(""); // Storing as comma-separated string for now
   const [description, setDescription] = useState("");
   const [mediaUrl, setMediaUrl] = useState("");
+  const [activeTab, setActiveTab] = useState("edit");
 
   const handleSave = async () => {
     const newSnippet: Snippet = {
@@ -99,16 +102,39 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="content">Code Content</Label>
-          <Textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Paste your code here"
-            className="font-mono min-h-[200px]"
-          />
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="edit">Edit</TabsTrigger>
+            <TabsTrigger value="preview">Preview</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="edit" className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="content">Code Content</Label>
+              <Textarea
+                id="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Paste your code here"
+                className="font-mono min-h-[200px]"
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="preview" className="pt-4">
+            {content ? (
+              <CodeBlock
+                code={content}
+                language={language || "javascript"}
+                showLineNumbers={true}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[200px] bg-muted/50 rounded-md border border-border">
+                <p className="text-muted-foreground">No code to preview</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
 
         <div className="space-y-2">
           <Label htmlFor="language">Language</Label>

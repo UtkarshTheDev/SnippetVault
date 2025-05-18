@@ -10,7 +10,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Heart, Code, ExternalLink } from "lucide-react";
+import { Heart, Code, ExternalLink, Eye, X } from "lucide-react";
+import { CodeBlock } from "@/components/ui/code-block";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface Snippet {
   id: string;
@@ -26,6 +34,7 @@ interface Snippet {
 const SnippetList: React.FC = () => {
   const [snippets, setSnippets] = useState<Snippet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewingSnippet, setViewingSnippet] = useState<Snippet | null>(null);
 
   useEffect(() => {
     const fetchSnippets = async () => {
@@ -36,6 +45,14 @@ const SnippetList: React.FC = () => {
 
     fetchSnippets();
   }, []);
+
+  const handleViewCode = (snippet: Snippet) => {
+    setViewingSnippet(snippet);
+  };
+
+  const handleCloseView = () => {
+    setViewingSnippet(null);
+  };
 
   if (loading) {
     return (
@@ -71,71 +88,143 @@ const SnippetList: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-      {snippets.map((snippet) => (
-        <Card
-          key={snippet.id}
-          className="overflow-hidden hover:shadow-md transition-all"
-        >
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xl font-bold text-primary">
-              {snippet.title}
-            </CardTitle>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Badge variant="outline" className="mr-2">
-                {snippet.language}
-              </Badge>
-            </div>
-          </CardHeader>
-
-          <CardContent>
-            {snippet.description && (
-              <p className="text-sm text-card-foreground mb-2">
-                {snippet.description.length > 100
-                  ? `${snippet.description.substring(0, 100)}...`
-                  : snippet.description}
-              </p>
-            )}
-
-            <div className="bg-muted/50 rounded p-2 font-mono text-sm text-muted-foreground overflow-hidden">
-              {snippet.content
-                ? snippet.content.substring(0, 80) + "..."
-                : "No content preview"}
-            </div>
-
-            <div className="flex flex-wrap gap-1 mt-3">
-              {snippet.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-xs">
-                  {tag}
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+        {snippets.map((snippet) => (
+          <Card
+            key={snippet.id}
+            className="overflow-hidden hover:shadow-md transition-all"
+          >
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-bold text-primary">
+                {snippet.title}
+              </CardTitle>
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Badge variant="outline" className="mr-2">
+                  {snippet.language}
                 </Badge>
-              ))}
-            </div>
-          </CardContent>
+              </div>
+            </CardHeader>
 
-          <CardFooter className="flex justify-between pt-2">
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
-              <Heart
-                className={`h-4 w-4 mr-1 ${
-                  snippet.liked ? "fill-destructive text-destructive" : ""
-                }`}
-              />
-              {snippet.liked ? "Liked" : "Like"}
-            </Button>
+            <CardContent>
+              {snippet.description && (
+                <p className="text-sm text-card-foreground mb-2">
+                  {snippet.description.length > 100
+                    ? `${snippet.description.substring(0, 100)}...`
+                    : snippet.description}
+                </p>
+              )}
 
-            {snippet.mediaUrl && (
+              <div className="overflow-hidden rounded">
+                {snippet.content ? (
+                  <CodeBlock
+                    code={
+                      snippet.content.substring(0, 150) +
+                      (snippet.content.length > 150 ? "..." : "")
+                    }
+                    language={snippet.language || "javascript"}
+                    maxHeight="120px"
+                  />
+                ) : (
+                  <div className="bg-muted/50 rounded p-2 font-mono text-sm text-muted-foreground">
+                    No content preview
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-1 mt-3">
+                {snippet.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+
+            <CardFooter className="flex justify-between pt-2">
               <Button
                 variant="ghost"
                 size="sm"
                 className="text-muted-foreground"
               >
-                <ExternalLink className="h-4 w-4 mr-1" />
-                Media
+                <Heart
+                  className={`h-4 w-4 mr-1 ${
+                    snippet.liked ? "fill-destructive text-destructive" : ""
+                  }`}
+                />
+                {snippet.liked ? "Liked" : "Like"}
               </Button>
+
+              <div className="flex gap-2">
+                {snippet.mediaUrl && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-1" />
+                    Media
+                  </Button>
+                )}
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground"
+                  onClick={() => handleViewCode(snippet)}
+                >
+                  <Eye className="h-4 w-4 mr-1" />
+                  View Code
+                </Button>
+              </div>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+
+      {/* Full Code View Dialog */}
+      <Dialog
+        open={viewingSnippet !== null}
+        onOpenChange={handleCloseView}
+        className="dark"
+      >
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col bg-sidebar text-sidebar-foreground border-border dark">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between text-primary">
+              <span>{viewingSnippet?.title}</span>
+              <Badge
+                variant="outline"
+                className="bg-sidebar-accent/10 text-primary"
+              >
+                {viewingSnippet?.language}
+              </Badge>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-hidden my-4">
+            {viewingSnippet && (
+              <CodeBlock
+                code={viewingSnippet.content}
+                language={viewingSnippet.language || "javascript"}
+                showLineNumbers={true}
+                maxHeight="60vh"
+                className="border border-border"
+              />
             )}
-          </CardFooter>
-        </Card>
-      ))}
-    </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleCloseView}
+              className="bg-sidebar-accent/10 hover:bg-sidebar-accent/20 text-primary border-border"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

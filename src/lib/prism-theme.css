@@ -1,0 +1,179 @@
+/**
+ * Custom Prism.js theme for SnippetVault
+ * Based on Catppuccin and T3 Chat inspired colors
+ */
+
+/* Import Fira Code font */
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap");
+
+/* Apply Fira Code to code blocks */
+code[class*="language-"],
+pre[class*="language-"] {
+  font-family: "Fira Code", monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  tab-size: 2;
+  hyphens: none;
+  background: none;
+  color: var(--sidebar-foreground, #fff);
+  text-shadow: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: 0;
+  overflow: auto;
+  border-radius: 0.5rem;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: 0.2em 0.4em;
+  border-radius: 0.3em;
+  white-space: normal;
+}
+
+/* Line numbers */
+pre.line-numbers {
+  position: relative;
+  padding-left: 3.8em;
+  counter-reset: linenumber;
+}
+
+pre.line-numbers > code {
+  position: relative;
+  white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  font-size: 100%;
+  left: -3.8em;
+  width: 3em;
+  letter-spacing: -1px;
+  border-right: 1px solid var(--border);
+  user-select: none;
+}
+
+.line-numbers-rows > span {
+  display: block;
+  counter-increment: linenumber;
+}
+
+.line-numbers-rows > span:before {
+  content: counter(linenumber);
+  color: var(--muted-foreground);
+  display: block;
+  padding-right: 0.8em;
+  text-align: right;
+}
+
+/* Token colors */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: var(--muted-foreground);
+}
+
+.token.punctuation {
+  color: var(--sidebar-foreground, #a9b1d6);
+}
+
+.token.namespace {
+  opacity: 0.7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: oklch(0.69 0.21 14.99); /* Destructive color */
+}
+
+.token.boolean,
+.token.number {
+  color: oklch(0.69 0.21 14.99); /* Destructive color */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: oklch(0.54 0.18 288.03); /* Primary color */
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: oklch(0.54 0.18 288.03); /* Primary color */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: oklch(0.54 0.18 288.03); /* Primary color */
+}
+
+.token.function,
+.token.class-name {
+  color: oklch(0.92 0.04 262.14); /* Accent color */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: oklch(0.69 0.21 14.99); /* Destructive color */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+/* Line highlighting */
+.line-highlight {
+  background: rgba(162, 89, 255, 0.1);
+  box-shadow: inset 5px 0 0 rgba(162, 89, 255, 0.5);
+}
+
+/* Code block scrollbar styling */
+pre[class*="language-"]::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}

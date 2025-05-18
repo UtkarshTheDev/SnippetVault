@@ -309,6 +309,7 @@ code {
   color: var(--accent);
   border-radius: var(--radius);
   padding: 0.5rem 1rem;
+  font-family: "Fira Code", var(--font-mono);
 }
 
 /* Tooltips, dialogs, tabs, etc. use the same border and radius system */
