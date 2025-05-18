@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Command, CommandInput, CommandList } from "@/components/ui/command";
+// Command component is imported but not used
 import {
   Code,
   Plus,
@@ -15,7 +15,7 @@ import {
   Search,
   Filter,
   Heart,
-  Eye,
+  // Eye, // Unused import
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -39,14 +39,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+// import { Switch } from "@/components/ui/switch"; // Unused import
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogDescription,
+  // DialogDescription, // Unused import
 } from "@/components/ui/dialog";
 import { CodeBlock } from "@/components/ui/code-block";
 

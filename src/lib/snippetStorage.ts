@@ -1,5 +1,7 @@
 import localforage from "localforage";
-import { sampleSnippets, initializeSampleSnippets } from "./sampleSnippets";
+import {
+  /* sampleSnippets, */ initializeSampleSnippets,
+} from "./sampleSnippets";
 
 const SNIPPET_STORAGE_KEY = "snippetvault_snippets";
 
@@ -69,7 +71,7 @@ export const loadSnippets = async (
         // Filter by tag
         if (filters.tag && filters.tag !== "all") {
           filteredSnippets = filteredSnippets.filter((snippet) =>
-            snippet.tags.includes(filters.tag)
+            snippet.tags.includes(filters.tag as string)
           );
         }
 
