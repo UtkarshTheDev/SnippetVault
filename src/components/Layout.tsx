@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import SnippetList from "./SnippetList";
 import SnippetEditor from "./SnippetEditor";
 import { Button } from "@/components/ui/button";
@@ -6,14 +6,80 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Command, CommandInput, CommandList } from "@/components/ui/command";
-import { Code, Plus, Clock, Tag, Settings } from "lucide-react";
+import { Code, Plus, Clock, Tag, Settings, Search, Filter } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { loadSnippets, type SearchFilters } from "@/lib/snippetStorage";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 const Layout: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [refreshKey, setRefreshKey] = useState(0);
   const snippetListRef = useRef<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<SearchFilters>({});
+  const [availableLanguages, setAvailableLanguages] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+  // Fetch available languages and tags for filters
+  useEffect(() => {
+    const fetchLanguagesAndTags = async () => {
+      const snippets = await loadSnippets();
+
+      // Extract unique languages
+      const languages = [
+        ...new Set(snippets.map((snippet) => snippet.language)),
+      ].filter(Boolean);
+      setAvailableLanguages(languages);
+
+      // Extract unique tags
+      const tags = [
+        ...new Set(snippets.flatMap((snippet) => snippet.tags)),
+      ].filter(Boolean);
+      setAvailableTags(tags);
+    };
+
+    fetchLanguagesAndTags();
+  }, [refreshKey]);
+
+  // Debounce search query to avoid too many re-renders
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Update filters when tab changes
+  useEffect(() => {
+    if (activeTab === "favorites") {
+      setFilters((prev) => ({ ...prev, onlyLiked: true }));
+    } else {
+      setFilters((prev) => ({ ...prev, onlyLiked: false }));
+    }
+  }, [activeTab]);
+
+  // Update search filters when search query changes
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, searchQuery: debouncedSearchQuery }));
+  }, [debouncedSearchQuery]);
 
   const handleCreateSnippetClick = () => {
     setIsEditing(true);
@@ -27,6 +93,22 @@ const Layout: React.FC = () => {
 
   const handleCancelEdit = () => {
     setIsEditing(false);
+  };
+
+  const handleLanguageFilterChange = (language: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      language: language === "all" ? undefined : language,
+    }));
+  };
+
+  const handleTagFilterChange = (tag: string) => {
+    setFilters((prev) => ({ ...prev, tag: tag === "all" ? undefined : tag }));
+  };
+
+  const handleClearFilters = () => {
+    setFilters({ onlyLiked: activeTab === "favorites" });
+    setSearchQuery("");
   };
 
   return (
@@ -91,10 +173,103 @@ const Layout: React.FC = () => {
       <div className="flex flex-col flex-1">
         {/* Top Bar */}
         <header className="bg-sidebar border-b border-border p-3 flex justify-between items-center">
-          <Command className="rounded-lg w-72">
-            <CommandInput placeholder="Search snippets..." />
-            <CommandList className="hidden" />
-          </Command>
+          <div className="flex items-center gap-2 flex-1 max-w-xl">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search snippets..."
+                className="pl-9 w-full"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-1 top-1 h-7 w-7 px-0"
+                  onClick={() => setSearchQuery("")}
+                >
+                  <span className="sr-only">Clear</span>
+                  <span className="text-muted-foreground">×</span>
+                </Button>
+              )}
+            </div>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-1">
+                  <Filter className="h-4 w-4" />
+                  <span>Filter</span>
+                  {(filters.language || filters.tag) && (
+                    <Badge
+                      variant="secondary"
+                      className="ml-1 rounded-sm px-1 font-normal"
+                    >
+                      {(filters.language ? 1 : 0) + (filters.tag ? 1 : 0)}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72" align="end">
+                <div className="space-y-4">
+                  <h4 className="font-medium leading-none">Filters</h4>
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <Label htmlFor="language-filter">Language</Label>
+                    <Select
+                      value={filters.language || "all"}
+                      onValueChange={handleLanguageFilterChange}
+                    >
+                      <SelectTrigger id="language-filter">
+                        <SelectValue placeholder="All languages" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All languages</SelectItem>
+                        {availableLanguages.map((lang) => (
+                          <SelectItem key={lang} value={lang}>
+                            {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {availableTags.length > 0 && (
+                    <div className="space-y-2">
+                      <Label htmlFor="tag-filter">Tag</Label>
+                      <Select
+                        value={filters.tag || "all"}
+                        onValueChange={handleTagFilterChange}
+                      >
+                        <SelectTrigger id="tag-filter">
+                          <SelectValue placeholder="All tags" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All tags</SelectItem>
+                          {availableTags.map((tag) => (
+                            <SelectItem key={tag} value={tag}>
+                              {tag}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={handleClearFilters}
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
 
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
@@ -119,7 +294,11 @@ const Layout: React.FC = () => {
               </div>
             ) : (
               <div className="w-full h-full bg-background">
-                <SnippetList key={refreshKey} ref={snippetListRef} />
+                <SnippetList
+                  key={refreshKey}
+                  ref={snippetListRef}
+                  filters={filters}
+                />
               </div>
             )}
 

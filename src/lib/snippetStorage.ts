@@ -15,6 +15,13 @@ export interface Snippet {
   updatedAt: number;
 }
 
+export interface SearchFilters {
+  searchQuery?: string;
+  language?: string;
+  tag?: string;
+  onlyLiked?: boolean;
+}
+
 // Save all snippets
 export const saveSnippets = async (snippets: Snippet[]): Promise<boolean> => {
   try {
@@ -27,13 +34,53 @@ export const saveSnippets = async (snippets: Snippet[]): Promise<boolean> => {
 };
 
 // Load all snippets
-export const loadSnippets = async (): Promise<Snippet[]> => {
+export const loadSnippets = async (
+  filters?: SearchFilters
+): Promise<Snippet[]> => {
   try {
     const snippets = await localforage.getItem(SNIPPET_STORAGE_KEY);
     if (snippets === null || snippets === undefined) {
       return [];
     } else {
-      return snippets as Snippet[];
+      let filteredSnippets = snippets as Snippet[];
+
+      // Apply filters if provided
+      if (filters) {
+        // Filter by search query (title, content, description)
+        if (filters.searchQuery && filters.searchQuery.trim() !== "") {
+          const query = filters.searchQuery.toLowerCase().trim();
+          filteredSnippets = filteredSnippets.filter(
+            (snippet) =>
+              snippet.title.toLowerCase().includes(query) ||
+              snippet.content.toLowerCase().includes(query) ||
+              (snippet.description &&
+                snippet.description.toLowerCase().includes(query))
+          );
+        }
+
+        // Filter by language
+        if (filters.language && filters.language !== "all") {
+          filteredSnippets = filteredSnippets.filter(
+            (snippet) => snippet.language === filters.language
+          );
+        }
+
+        // Filter by tag
+        if (filters.tag && filters.tag !== "all") {
+          filteredSnippets = filteredSnippets.filter((snippet) =>
+            snippet.tags.includes(filters.tag)
+          );
+        }
+
+        // Filter by liked status
+        if (filters.onlyLiked) {
+          filteredSnippets = filteredSnippets.filter(
+            (snippet) => snippet.liked
+          );
+        }
+      }
+
+      return filteredSnippets;
     }
   } catch (error) {
     console.error("Error loading snippets:", error);
