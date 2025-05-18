@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Prism from "prismjs";
 import { cn } from "@/lib/utils";
 

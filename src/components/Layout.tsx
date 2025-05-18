@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Command, CommandInput, CommandList } from "@/components/ui/command";
-import { Code, Plus, Search, Star, Clock, Tag, Settings } from "lucide-react";
+import { Code, Plus, Clock, Tag, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Layout: React.FC = () => {

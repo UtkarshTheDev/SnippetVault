@@ -21,7 +21,6 @@ import {
   ExternalLink,
   Eye,
   Trash2,
-  Edit,
   MoreVertical,
 } from "lucide-react";
 import { CodeBlock } from "@/components/ui/code-block";
@@ -42,13 +41,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
-const SnippetList = React.forwardRef<HTMLDivElement, {}>((props, ref) => {
+const SnippetList = React.forwardRef<HTMLDivElement>((_, ref) => {
   const [snippets, setSnippets] = useState<Snippet[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewingSnippet, setViewingSnippet] = useState<Snippet | null>(null);
   const [deleteConfirmSnippet, setDeleteConfirmSnippet] =
     useState<Snippet | null>(null);
-  const [editingSnippet, setEditingSnippet] = useState<Snippet | null>(null);
 
   const fetchSnippets = async () => {
     setLoading(true);
@@ -269,11 +267,7 @@ const SnippetList = React.forwardRef<HTMLDivElement, {}>((props, ref) => {
       </div>
 
       {/* Full Code View Dialog */}
-      <Dialog
-        open={viewingSnippet !== null}
-        onOpenChange={handleCloseView}
-        className="dark"
-      >
+      <Dialog open={viewingSnippet !== null} onOpenChange={handleCloseView}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col bg-sidebar text-sidebar-foreground border-border dark">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between text-primary">
@@ -315,7 +309,6 @@ const SnippetList = React.forwardRef<HTMLDivElement, {}>((props, ref) => {
       <Dialog
         open={deleteConfirmSnippet !== null}
         onOpenChange={(open) => !open && setDeleteConfirmSnippet(null)}
-        className="dark"
       >
         <DialogContent className="bg-sidebar text-sidebar-foreground border-border dark">
           <DialogHeader>
