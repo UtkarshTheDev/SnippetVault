@@ -19,9 +19,9 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className="flex w-screen h-screen bg-[#1a1a1a] text-[#f8f9fa]">
+    <div className="flex w-screen h-screen bg-background text-foreground">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#2a2a2a] p-4">
+      <aside className="w-64 bg-sidebar p-4">
         <h2 className="text-lg font-bold mb-4 font-sans">Sidebar</h2>
         {/* Sidebar content goes here */}
       </aside>
@@ -29,7 +29,7 @@ const Layout: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex flex-col flex-1">
         {/* Top Bar */}
-        <header className="bg-[#2a2a2a] p-4 flex justify-between items-center shadow-md">
+        <header className="bg-sidebar p-4 flex justify-between items-center shadow-md">
           <h1 className="text-xl font-bold font-sans">SnippetAI</h1>
           {/* Top bar content goes here (search, avatar) */}
         </header>
@@ -51,7 +51,7 @@ const Layout: React.FC = () => {
           {/* Floating Action Button */}
           {!isEditing && (
             <button
-              className="fixed bottom-8 right-8 bg-[#00b894] text-white p-4 rounded-full shadow-lg hover:bg-[#00a386] transition-colors"
+              className="fixed bottom-8 right-8 bg-primary text-primary-foreground p-4 rounded-full shadow-lg hover:bg-primary/80 transition-colors"
               onClick={handleCreateSnippetClick}
               aria-label="Create new snippet"
             >

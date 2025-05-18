@@ -27,12 +27,12 @@ const SnippetList: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <div className="text-[#f8f9fa]">Loading snippets...</div>;
+    return <div className="text-foreground">Loading snippets...</div>;
   }
 
   if (snippets.length === 0) {
     return (
-      <div className="text-[#f8f9fa]">No snippets yet—create one now!</div>
+      <div className="text-foreground">No snippets yet—create one now!</div>
     );
   }
 
@@ -41,15 +41,15 @@ const SnippetList: React.FC = () => {
       {snippets.map((snippet) => (
         <div
           key={snippet.id}
-          className="bg-[#2a2a2a] p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+          className="bg-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
         >
-          <h3 className="text-xl font-bold text-[#00b894]">{snippet.title}</h3>
-          <p className="text-sm text-[#f8f9fa] mt-2 font-mono">
+          <h3 className="text-xl font-bold text-primary">{snippet.title}</h3>
+          <p className="text-sm text-foreground mt-2 font-mono">
             {snippet.language}
           </p>
           {/* Add more snippet details and actions here */}
           {/* Placeholder for code preview */}
-          <div className="mt-4 text-sm font-mono text-gray-400 italic">
+          <div className="mt-4 text-sm font-mono text-muted-foreground italic">
             {snippet.content
               ? snippet.content.substring(0, 50) + "..."
               : "No content preview"}

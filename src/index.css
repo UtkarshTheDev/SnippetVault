@@ -1,7 +1,15 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+body {
+  font-family: var(--font-sans);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
 
 :root {
   --background: oklch(1 0 0);
@@ -170,4 +178,24 @@
 
 body {
   letter-spacing: var(--tracking-normal);
+}
+
+/* Add subtle glow effect to primary elements */
+.btn-primary,
+.btn-accent,
+[class*="ring-primary"] {
+  box-shadow: 0 0 15px var(--primary) / 0.2;
+}
+
+/* Add subtle hover animations */
+.btn,
+.card,
+.input,
+.select {
+  transition: all 0.2s ease;
+}
+
+.btn:hover,
+.card:hover {
+  transform: translateY(-2px);
 }

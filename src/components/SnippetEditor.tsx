@@ -49,14 +49,14 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
   };
 
   return (
-    <div className="p-8 bg-[#2a2a2a] rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-[#00b894] font-sans">
+    <div className="p-8 bg-card rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-6 text-primary font-sans">
         Create New Snippet
       </h2>
       <div className="mb-6">
         <label
           htmlFor="title"
-          className="block text-sm font-medium text-[#f8f9fa] mb-1 font-serif"
+          className="block text-sm font-medium text-foreground mb-1 font-serif"
         >
           Title
         </label>
@@ -65,13 +65,13 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 block w-full rounded-md bg-[#1a1a1a] border-gray-700 text-[#f8f9fa] shadow-sm focus:border-[#00b894] focus:ring-[#00b894] sm:text-sm p-2"
+          className="mt-1 block w-full rounded-md bg-background border-border text-foreground shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2"
         />
       </div>
       <div className="mb-6">
         <label
           htmlFor="content"
-          className="block text-sm font-medium text-[#f8f9fa] mb-1 font-serif"
+          className="block text-sm font-medium text-foreground mb-1 font-serif"
         >
           Code Content
         </label>
@@ -80,13 +80,13 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={10}
-          className="mt-1 block w-full rounded-md bg-[#1a1a1a] border-gray-700 text-[#f8f9fa] shadow-sm focus:border-[#00b894] focus:ring-[#00b894] sm:text-sm font-mono p-2"
+          className="mt-1 block w-full rounded-md bg-background border-border text-foreground shadow-sm focus:border-primary focus:ring-primary sm:text-sm font-mono p-2"
         ></textarea>
       </div>
       <div className="mb-6">
         <label
           htmlFor="language"
-          className="block text-sm font-medium text-[#f8f9fa] mb-1 font-serif"
+          className="block text-sm font-medium text-foreground mb-1 font-serif"
         >
           Language
         </label>
@@ -95,13 +95,13 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
           id="language"
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
-          className="mt-1 block w-full rounded-md bg-[#1a1a1a] border-gray-700 text-[#f8f9fa] shadow-sm focus:border-[#00b894] focus:ring-[#00b894] sm:text-sm p-2"
+          className="mt-1 block w-full rounded-md bg-background border-border text-foreground shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2"
         />
       </div>
       <div className="mb-6">
         <label
           htmlFor="tags"
-          className="block text-sm font-medium text-[#f8f9fa] mb-1 font-serif"
+          className="block text-sm font-medium text-foreground mb-1 font-serif"
         >
           Tags (comma-separated)
         </label>
@@ -110,13 +110,13 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
           id="tags"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
-          className="mt-1 block w-full rounded-md bg-[#1a1a1a] border-gray-700 text-[#f8f9fa] shadow-sm focus:border-[#00b894] focus:ring-[#00b894] sm:text-sm p-2"
+          className="mt-1 block w-full rounded-md bg-background border-border text-foreground shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2"
         />
       </div>
       <div className="mb-6">
         <label
           htmlFor="description"
-          className="block text-sm font-medium text-[#f8f9fa] mb-1 font-serif"
+          className="block text-sm font-medium text-foreground mb-1 font-serif"
         >
           Description
         </label>
@@ -125,13 +125,13 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
-          className="mt-1 block w-full rounded-md bg-[#1a1a1a] border-gray-700 text-[#f8f9fa] shadow-sm focus:border-[#00b894] focus:ring-[#00b894] sm:text-sm p-2"
+          className="mt-1 block w-full rounded-md bg-background border-border text-foreground shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2"
         ></textarea>
       </div>
       <div className="mb-6">
         <label
           htmlFor="mediaUrl"
-          className="block text-sm font-medium text-[#f8f9fa] mb-1 font-serif"
+          className="block text-sm font-medium text-foreground mb-1 font-serif"
         >
           Media URL
         </label>
@@ -140,19 +140,19 @@ const SnippetEditor: React.FC<SnippetEditorProps> = ({ onSave, onCancel }) => {
           id="mediaUrl"
           value={mediaUrl}
           onChange={(e) => setMediaUrl(e.target.value)}
-          className="mt-1 block w-full rounded-md bg-[#1a1a1a] border-gray-700 text-[#f8f9fa] shadow-sm focus:border-[#00b894] focus:ring-[#00b894] sm:text-sm p-2"
+          className="mt-1 block w-full rounded-md bg-background border-border text-foreground shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2"
         />
       </div>
 
       <div className="flex justify-end space-x-4">
         <button
-          className="px-6 py-2 text-sm font-medium text-[#f8f9fa] rounded-md border border-gray-700 hover:bg-[#2a2a2a] transition-colors font-sans"
+          className="px-6 py-2 text-sm font-medium text-foreground rounded-md border border-border hover:bg-muted transition-colors font-sans"
           onClick={onCancel}
         >
           Cancel
         </button>
         <button
-          className="px-6 py-2 text-sm font-medium text-white bg-[#00b894] rounded-md hover:bg-[#00a386] transition-colors font-sans"
+          className="px-6 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/80 transition-colors font-sans"
           onClick={handleSave}
         >
           Save Snippet
