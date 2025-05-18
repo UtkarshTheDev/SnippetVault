@@ -1,7 +1,11 @@
 import Layout from "./components/Layout";
 
 function App() {
-  return <Layout />;
+  return (
+    <div className="min-h-screen bg-background">
+      <Layout />
+    </div>
+  );
 }
 
 export default App;

@@ -27,7 +27,7 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className="flex w-screen h-screen bg-background text-foreground">
+    <div className="flex w-full h-full min-h-screen bg-background text-foreground">
       {/* Sidebar */}
       <aside className="w-64 bg-sidebar p-4 border-r border-border flex flex-col">
         <div className="flex items-center gap-2 mb-6">
@@ -104,8 +104,8 @@ const Layout: React.FC = () => {
         </header>
 
         {/* Main Area */}
-        <ScrollArea className="flex-1">
-          <main className="flex-1 relative">
+        <ScrollArea className="flex-1 h-full bg-background">
+          <main className="flex-1 relative min-h-full bg-background">
             {/* Main content goes here (snippet list or editor) */}
             {isEditing ? (
               <div className="p-6">
@@ -115,7 +115,7 @@ const Layout: React.FC = () => {
                 />
               </div>
             ) : (
-              <div className="w-full h-full">
+              <div className="w-full h-full bg-background">
                 <SnippetList />
               </div>
             )}
