@@ -5,6 +5,9 @@
   <h3>Your Personal Code Snippet Manager</h3>
 </div>
 
+> **⚠️ Hackathon Project Notice**  
+> This project was created for a hackathon and has been submitted. It is **not actively maintained** and no future updates or features are planned. The project is provided as-is for educational and reference purposes. If future updates are needed, this README will be updated accordingly.
+
 SnippetVault is a modern, elegant code snippet manager built with React, TypeScript, and Vite. It allows developers to store, organize, and quickly access their frequently used code snippets with syntax highlighting for multiple programming languages.
 
 - View At: https://snippet-vault-ten.vercel.app/
